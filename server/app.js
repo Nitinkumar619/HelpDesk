@@ -23,9 +23,8 @@ const server = http.createServer(app);
 // --- Middleware Setup ---
 // Enable CORS with specific origin for security
 app.use(cors({
-  // origin: "https://help-desk-iiita.vercel.app", // Use your production frontend URL
-  origin: "http://localhost:5173",
-}));
+     origin: process.env.CLIENT_URL || "http://localhost:5173",
+  }));
 
 // Body parsers for JSON and URL-encoded data
 app.use(express.json());
