@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Building2, ArrowLeft, LogOut, User, Menu, X } from "lucide-react";
+import { Receipt, ArrowLeft, LogOut, User, Menu, X } from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -53,7 +53,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
             )}
             <Link to="/" className="flex items-center gap-2 group">
               <div className="bg-white p-2 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300">
-                <Building2 className="h-6 w-6 text-indigo-700" />
+                <Receipt className="h-6 w-6 text-indigo-700" />
               </div>
               <h1 className="text-2xl font-bold text-white tracking-tight group-hover:text-indigo-200 transition-colors duration-300">
                 IIITA <span className="text-indigo-300">Help Desk</span>
