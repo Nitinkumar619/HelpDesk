@@ -64,8 +64,12 @@ const createComplaint = async (complaint) => {
 
   try {
     const { rows } = await pool.query(sql, values);
-    // After successfully inserting, send the confirmation email.
-    await sendTicketSubmissionMail(email, name, type, code);
+    // Send the confirmation email in the background — don't block the
+    // response on it, so a slow/misconfigured mail server can't stall
+    // ticket submission or cause a client-side timeout.
+    sendTicketSubmissionMail(email, name, type, code).catch((mailErr) => {
+      console.error('Error sending ticket submission email:', mailErr);
+    });
     return rows[0]; // Return the newly created complaint
   } catch (error) {
     console.error('Error creating complaint:', error);
@@ -149,7 +153,10 @@ const assignPersonnel = async (id, assignedName, assignedContact) => {
   if (userDetailsRows.length > 0) {
     const { name, email, type_name } = userDetailsRows[0];
     // Step 5: Send the email.
-    await adminAssignedPersonnelMail(email, name, type_name, assignedName, assignedContact);
+    // Step 5: Send the email in the background (don't block the response).
+    adminAssignedPersonnelMail(email, name, type_name, assignedName, assignedContact).catch((mailErr) => {
+      console.error('Error sending personnel assigned email:', mailErr);
+    });
   }
 };
 
@@ -178,8 +185,10 @@ const markResolved = async (id) => {
   const updateComplaint = "UPDATE complaints SET status = 'Resolved' WHERE id = $1";
   await pool.query(updateComplaint, [id]);
 
-  // Step 3: Send the notification email.
-  await complaintResolvedMail(email, name, type);
+  // Step 3: Send the notification email in the background (don't block the response).
+  complaintResolvedMail(email, name, type).catch((mailErr) => {
+    console.error('Error sending complaint resolved email:', mailErr);
+  });
 
   // Step 4: If a personnel was assigned, update their status to available.
   if (personnelId) {
