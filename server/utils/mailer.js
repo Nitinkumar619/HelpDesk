@@ -1,40 +1,17 @@
-const nodemailer = require("nodemailer");
-const dns = require("dns");
+const { Resend } = require("resend");
 
-// Force Node to prefer IPv4 when resolving hostnames — Render's free tier
-// only provides IPv6 outbound by default, which causes Gmail's SMTP
-// connection to hang/timeout since it doesn't route properly over IPv6.
-dns.setDefaultResultOrder("ipv4first");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // STARTTLS
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD,
-  },
-  connectionTimeout: 10000,
-  family: 4, // force IPv4
-});
-
-
-const sendMail = (options) => {
-  return new Promise((resolve, reject) => {
-    transporter.sendMail(
-      {
-        from: process.env.EMAIL,
-        ...options,
-      },
-      (err, info) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(info);
-        }
-      }
-    );
+const sendMail = async (options) => {
+  const { data, error } = await resend.emails.send({
+    from: "IIITA Help Desk <noreply@iiitahelpdesk.online>",
+    ...options,
   });
+
+  if (error) {
+    throw new Error(error.message || "Failed to send email via Resend");
+  }
+  return data;
 };
 
 
