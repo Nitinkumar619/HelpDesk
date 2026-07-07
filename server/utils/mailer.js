@@ -1,14 +1,21 @@
 const nodemailer = require("nodemailer");
+const dns = require("dns");
+
+// Force Node to prefer IPv4 when resolving hostnames — Render's free tier
+// only provides IPv6 outbound by default, which causes Gmail's SMTP
+// connection to hang/timeout since it doesn't route properly over IPv6.
+dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // STARTTLS, not implicit TLS
+  secure: false, // STARTTLS
   auth: {
     user: process.env.EMAIL,
     pass: process.env.PASSWORD,
   },
-  connectionTimeout: 10000, // fail fast (10s) instead of hanging
+  connectionTimeout: 10000,
+  family: 4, // force IPv4
 });
 
 
