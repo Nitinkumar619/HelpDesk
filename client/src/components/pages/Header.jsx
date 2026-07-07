@@ -5,6 +5,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const Header = ({ isLoggedIn, onLogout }) => {
   const [userName, setUserName] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,6 +17,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
         try {
           const decoded = jwtDecode(token);
           setUserName(decoded.name || "User");
+          setIsAdmin(decoded.role === "admin");
         } catch (err) {
           console.error("Invalid token", err);
         }
@@ -82,7 +84,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
             ) : (
               <div className="flex items-center gap-4">
                 <Link
-                  to="/profile"
+                  to={isAdmin ? "/admin" : "/profile"}
                   className="flex items-center gap-3 px-4 py-2 bg-indigo-700 text-white rounded-lg font-medium text-sm hover:bg-indigo-600 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   <div className="bg-white text-indigo-800 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold shadow-inner">
@@ -136,7 +138,7 @@ const Header = ({ isLoggedIn, onLogout }) => {
             ) : (
               <div className="flex flex-col gap-3">
                 <Link
-                  to="/profile"
+                  to={isAdmin ? "/admin" : "/profile"}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-indigo-700 text-white rounded-lg font-medium text-sm transition duration-300"
                   onClick={() => setMenuOpen(false)}
                 >
