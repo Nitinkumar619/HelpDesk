@@ -13,6 +13,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,6 +21,7 @@ const LandingPage = () => {
       const decoded = jwtDecode(token);
       setUserName(decoded.name || "User");
       setIsLoggedIn(true);
+      setIsAdmin(decoded.role === "admin");
     }
   }, []);
 
@@ -73,7 +75,7 @@ const LandingPage = () => {
               </Button>
               {isLoggedIn && (
                 <Button
-                onClick={() => navigate("/profile")}
+                onClick={() => navigate(isAdmin ? "/admin" : "/profile")}
                 icon={ChevronRight}
                 variant="primary"
               >
