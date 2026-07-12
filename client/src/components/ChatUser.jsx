@@ -11,7 +11,7 @@ const Chat = () => {
   const decoded = token ? jwtDecode(token) : null;
 
   // Assuming useChat correctly handles state, but we will add guards below.
-  const { userMessages, setUserMessages, sendMessage } = useChat({
+  const { messages: userMessages, setMessages: setUserMessages, sendMessage } = useChat({
     userId: decoded?.id,
     isAdmin: false
   });
