@@ -42,13 +42,13 @@ const getAvailablePersonnels = async (req, res) => {
  */
 const addPersonnels = async (req, res) => {
   try {
-    const { name, contact, role } = req.body;
+    const { name, contact, email, role } = req.body;
 
     if (!name || !contact || !role) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
-    await addPersonnel({ name, contact, role });
+    await addPersonnel({ name, contact, email, role });
 
     res.status(201).json({ success: true, message: "Personnel added successfully" });
   } catch (error) {

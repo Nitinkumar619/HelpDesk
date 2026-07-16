@@ -113,10 +113,35 @@ const sendForgotPasswordMail = (email, name, resetLink) => {
   });
 };
 
+const generatePersonnelAssignedHTML = (personnelName, type, location, studentMessage) => {
+  return `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2 style="color: #4f46e5;">New Ticket Assigned to You</h2>
+      <p>Hi <span style="font-size: 1.1rem; color: rgb(85, 235, 15);">${personnelName}</span>,</p>
+      <p>You've been assigned a new <span style="font-size: 1.2rem; color: rgb(239, 51, 67);">${type}</span> complaint.</p>
+      <p><strong>Location:</strong> ${location || "Not specified"}</p>
+      <p><strong>Details:</strong> ${studentMessage || "No additional details provided."}</p>
+      <p style="margin-top: 20px;">Please attend to this at your earliest convenience.</p>
+      <br>
+      <p style="font-size: 0.9rem; color: gray;">Thank you,<br>IIITA Help Desk Team</p>
+    </div>
+  `;
+};
+
+const sendPersonnelAssignedMail = (personnelEmail, personnelName, type, location, studentMessage) => {
+  const htmlContent = generatePersonnelAssignedHTML(personnelName, type, location, studentMessage);
+  return sendMail({
+    to: personnelEmail,
+    subject: "IIITA Help Desk - New Ticket Assigned to You",
+    html: htmlContent,
+  });
+};
+
 module.exports = { 
   sendMail, 
   sendTicketSubmissionMail, 
   adminAssignedPersonnelMail, 
   complaintResolvedMail,
-  sendForgotPasswordMail
+  sendForgotPasswordMail,
+  sendPersonnelAssignedMail
 };

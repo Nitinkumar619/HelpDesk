@@ -4,7 +4,8 @@ require("dotenv").config();
 const {
   sendTicketSubmissionMail,
   adminAssignedPersonnelMail,
-  complaintResolvedMail
+  complaintResolvedMail,
+  sendPersonnelAssignedMail
 } = require("../utils/mailer");
 
 // Helper function to generate a random 4-digit code for tickets
@@ -123,14 +124,15 @@ const getUserComplaint = async (email) => {
  * @returns {Promise<void>}
  */
 const assignPersonnel = async (id, assignedName, assignedContact) => {
-  // Step 1: Find the personnel ID.
-  const fetchPersonnel = "SELECT id FROM personnel WHERE name = $1 AND contact = $2";
+  // Step 1: Find the personnel ID (and email, for notifying them).
+  const fetchPersonnel = "SELECT id, email FROM personnel WHERE name = $1 AND contact = $2";
   const { rows: personnelRows } = await pool.query(fetchPersonnel, [assignedName, assignedContact]);
 
   if (personnelRows.length === 0) {
     throw new Error("Personnel not found.");
   }
   const personnelId = personnelRows[0].id;
+  const personnelEmail = personnelRows[0].email;
 
   // Step 2: Update the complaint to assign the personnel and change status.
   const updateComplaint = "UPDATE complaints SET assigned_personnel_id = $1, status = 'Assigned' WHERE id = $2";
@@ -141,8 +143,9 @@ const assignPersonnel = async (id, assignedName, assignedContact) => {
   await pool.query(updatePersonnel, [personnelId]);
 
   // Step 4: Get user details to send a notification email.
+  // Step 4: Get complaint + user details to send notification emails.
   const getUserDetails = `
-    SELECT u.name, u.email, ct.type_name
+    SELECT u.name, u.email, ct.type_name, c.location, c.message
     FROM complaints c
     JOIN users u ON c.user_id = u.id
     JOIN complaint_types ct ON c.complaint_type_id = ct.id
@@ -151,12 +154,19 @@ const assignPersonnel = async (id, assignedName, assignedContact) => {
   const { rows: userDetailsRows } = await pool.query(getUserDetails, [id]);
 
   if (userDetailsRows.length > 0) {
-    const { name, email, type_name } = userDetailsRows[0];
-    // Step 5: Send the email.
-    // Step 5: Send the email in the background (don't block the response).
+    const { name, email, type_name, location, message } = userDetailsRows[0];
+
+    // Step 5: Notify the student, in the background.
     adminAssignedPersonnelMail(email, name, type_name, assignedName, assignedContact).catch((mailErr) => {
       console.error('Error sending personnel assigned email:', mailErr);
     });
+
+    // Step 6: Notify the personnel too, if we have their email on file.
+    if (personnelEmail) {
+      sendPersonnelAssignedMail(personnelEmail, assignedName, type_name, location, message).catch((mailErr) => {
+        console.error('Error sending personnel notification email:', mailErr);
+      });
+    }
   }
 };
 

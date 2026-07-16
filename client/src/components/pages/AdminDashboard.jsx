@@ -15,27 +15,23 @@ const AdminDashboard = () => {
   const [availablePersonnel, setAvailablePersonnel] = useState([]);
   const [addPersonnelModal, setAddPersonnelModal] = useState(false);
   const [newPersonnel, setNewPersonnel] = useState({
-    name: "", contact: "", role: "",
+    name: "", contact: "", email: "", role: "",
   });
 
   const [filterStatus, setFilterStatus] = useState("Active");
   const { notify } = useNotify();
 const resolve = async (id) => {
   try {
-    // Use the apiClient instance. It automatically adds the base URL and auth token.
     const { data } = await apiClient.patch(`/api/complaints/${id}`);
 
     if (data.success) {
       notify(data.message || "Complaint resolved and email sent to user");
-      // Update state by removing the resolved complaint.
       setComplaints((prev) => prev.filter((c) => c.id !== id));
     } else {
-      // This else block might not be needed if the server always sends error statuses for failures.
       notify(data.message || "Failed to resolve", "error");
     }
   } catch (error) {
     console.error("Error resolving complaint:", error);
-    // Axios provides detailed server error messages in `error.response.data.message`.
     notify(error.response?.data?.message || "An error occurred while resolving the complaint.", "error");
   }
 };
@@ -82,7 +78,6 @@ const handleAssign = async () => {
     return;
   }
   try {
-    // With Axios, you pass the body object directly. It handles the JSON conversion.
     const { data } = await apiClient.put(
       `/api/complaints/${selectedComplaintId}/assign`,
       { assignedName, assignedContact }
@@ -90,7 +85,7 @@ const handleAssign = async () => {
 
     if (data.success) {
       notify("Personnel assigned successfully!");
-      fetchComplaints(); // Refetch to update the list.
+      fetchComplaints();
       setModalOpen(false);
     } else {
       notify(data.message || "Failed to assign", "error");
@@ -102,19 +97,19 @@ const handleAssign = async () => {
 };
 
 const handleAddPersonnel = async () => {
-  const { name, contact, role } = newPersonnel;
+  const { name, contact, email, role } = newPersonnel;
   if (!name || !contact || !role) {
     notify("All fields are required", "error");
     return;
   }
 
   try {
-    const { data } = await apiClient.post("/api/personnel", { name, contact, role });
+    const { data } = await apiClient.post("/api/personnel", { name, contact, email, role });
 
     if (data.success) {
       notify("Personnel added successfully");
       setAddPersonnelModal(false);
-      setNewPersonnel({ name: "", contact: "", role: "" });
+      setNewPersonnel({ name: "", contact: "", email: "", role: "" });
     } else {
       notify(data.message || "Failed to add personnel", "error");
     }
@@ -124,12 +119,10 @@ const handleAddPersonnel = async () => {
   }
 };
 
-// This useEffect hook correctly calls fetchComplaints on component mount.
 useEffect(() => {
   fetchComplaints();
 }, []);
 
-  // Filter complaints based on status filter
   const filteredComplaints = complaints.filter(c => 
     filterStatus === "Active" ? c.status !== "Resolved" : c.status === "Resolved"
   );
@@ -137,7 +130,6 @@ useEffect(() => {
   return (
     <main className="bg-gray-900 min-h-screen text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with gradient */}
         <div className="bg-gradient-to-r from-indigo-800 to-purple-800 rounded-2xl p-6 mb-8 shadow-lg">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
@@ -151,7 +143,6 @@ useEffect(() => {
             </div>
           </div>
           
-          {/* Status filter tabs */}
           <div className="mt-6 border-b border-indigo-700">
             <div className="flex">
               <button
@@ -178,7 +169,6 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Complaints list */}
         {filteredComplaints.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 bg-gray-800 rounded-xl">
             <Document />
@@ -195,7 +185,6 @@ useEffect(() => {
                     : "border-l-4 border-yellow-500"
                 }`}
               >
-                {/* Card header */}
                 <div className="bg-gray-750 px-4 py-3 flex justify-between items-center">
                   <div className="flex items-center">
                     <span className="font-medium text-lg text-white">{complaint.complaint_type}</span>
@@ -224,9 +213,7 @@ useEffect(() => {
                   </span>
                 </div>
                 
-                {/* Card body */}
                 <div className="p-4 space-y-3">
-                  {/* User info section */}
                   <div className="flex items-start space-x-3">
                     <div className="p-2 bg-indigo-500/10 rounded-lg">
                       <Person />
@@ -239,7 +226,6 @@ useEffect(() => {
                     </div>
                   </div>
                   
-                  {/* Message section */}
                   <div className="flex items-start space-x-3">
                     <div className="p-2 bg-indigo-500/10 rounded-lg">
                       <Chat />
@@ -261,7 +247,6 @@ useEffect(() => {
                     </div>
                   </div>
                   
-                  {/* Personnel section */}
                   <div className="flex items-start space-x-3">
                     <div className="p-2 bg-indigo-500/10 rounded-lg">
                       <Group />
@@ -279,13 +264,11 @@ useEffect(() => {
                     </div>
                   </div>
                   
-                  {/* Date section condensed */}
                   <div className="text-xs text-gray-400 pt-2 border-t border-gray-700">
                     Created: {new Date(complaint.createdAt).toLocaleString()}
                   </div>
                 </div>
                 
-                {/* Card footer */}
                 <div className="px-4 py-3 bg-gray-750">
                   {filterStatus !== "Resolved" && (
                     complaint.assigned_personnel_id ? (
@@ -313,7 +296,6 @@ useEffect(() => {
         )}
       </div>
 
-      {/* Assign Personnel Modal */}
       {modalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <div className="bg-gray-800 rounded-xl w-full max-w-md overflow-hidden shadow-2xl transform transition-all">
@@ -371,7 +353,6 @@ useEffect(() => {
         </div>
       )}
 
-      {/* Add Personnel Modal */}
       {addPersonnelModal && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <div className="bg-gray-800 rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
@@ -392,12 +373,23 @@ useEffect(() => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Contact</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Contact (phone number)</label>
                 <input
                   type="text"
-                  placeholder="Phone or Email"
+                  placeholder="e.g. 9876543210"
                   value={newPersonnel.contact}
                   onChange={(e) => setNewPersonnel({ ...newPersonnel, contact: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Email (optional, for assignment notifications)</label>
+                <input
+                  type="email"
+                  placeholder="e.g. ravi@example.com"
+                  value={newPersonnel.email}
+                  onChange={(e) => setNewPersonnel({ ...newPersonnel, email: e.target.value })}
                   className="w-full px-4 py-2 rounded-lg bg-gray-700 border border-gray-600 text-white outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
@@ -438,7 +430,6 @@ useEffect(() => {
         </div>
       )}
 
-      {/* Chat button */}
       <FloatingChatButton />
     </main>
   );

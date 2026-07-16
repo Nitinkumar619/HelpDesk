@@ -80,11 +80,11 @@ const addPersonnel = async (person) => {
   // Use TRUE for boolean values in PostgreSQL.
   // RETURNING * will return the entire newly created row.
   const query = `
-    INSERT INTO personnel (name, contact, role, available) 
-    VALUES ($1, $2, $3, TRUE) 
+    INSERT INTO personnel (name, contact, email, role, available) 
+    VALUES ($1, $2, $3, $4, TRUE) 
     RETURNING *
   `;
-  const values = [person.name, person.contact, person.role];
+  const values = [person.name, person.contact, person.email || null, person.role];
   try {
     const { rows } = await pool.query(query, values);
     console.log('New personnel added:', rows[0]);

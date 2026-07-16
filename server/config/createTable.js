@@ -243,12 +243,13 @@ const createTable = async () => {
     // Uses BOOLEAN type, which is standard in PostgreSQL for true/false values.
     await pool.query(`
       CREATE TABLE IF NOT EXISTS personnel (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        contact VARCHAR(15) NOT NULL,
-        role TEXT CHECK (role IN ('Network', 'Cleaning', 'Carpentry', 'PC Maintenance', 'Plumbing', 'Electricity')) NOT NULL,
-        available BOOLEAN NOT NULL
-      );
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      contact VARCHAR(100) NOT NULL,
+      email VARCHAR(150),
+      role TEXT CHECK (role IN ('Network', 'Cleaning', 'Carpentry', 'PC Maintenance', 'Plumbing', 'Electricity')) NOT NULL,
+      available BOOLEAN NOT NULL
+    );
     `);
 
     // Complaint types table
