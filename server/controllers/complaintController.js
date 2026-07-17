@@ -17,7 +17,7 @@ const submitComplaint = async (req, res) => {
   try {
     const { name, email, priority, location, type, message } = req.body;
     // Process file attachments, creating a comma-separated string of filenames.
-    const attachments = req.files?.map((file) => file.filename).join(",") || "";
+    const attachments = req.files?.map((file) => file.path).join(",") || "";
 
     if (!name || !email || !priority || !location || !type || !message) {
       return res.status(400).json({
