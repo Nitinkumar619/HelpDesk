@@ -272,7 +272,7 @@ useEffect(() => {
                     <div className="flex items-start">
                       <File className="w-4 h-4 text-gray-400 mr-2 mt-0.5 shrink-0" />
                       <a
-                        href={`${apiUrl}/uploads/${complaint.attachments}`}
+                        href={complaint.attachments}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-indigo-400 hover:text-indigo-300 flex items-center"

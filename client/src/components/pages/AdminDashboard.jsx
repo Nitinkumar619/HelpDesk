@@ -235,7 +235,7 @@ useEffect(() => {
                       <p className="text-sm text-gray-300 mt-1">{complaint.message}</p>
                       {complaint.attachments && (
                         <a
-                          href={`${apiUrl}/uploads/${complaint.attachments}`}
+                          href={complaint.attachments}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs flex items-center text-indigo-400 hover:text-indigo-300 mt-1"
