@@ -299,13 +299,18 @@ useEffect(() => {
                 <div className="px-4 py-3 bg-gray-750">
                   {filterStatus !== "Resolved" && (
                     complaint.assigned_personnel_id ? (
-                      <button
-                        onClick={() => resolve(complaint.id)}
-                        className="w-full flex justify-center items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition"
-                      >
-                        <Success />
-                        Mark as Resolved
-                      </button>
+                      <div>
+                        <button
+                          onClick={() => resolve(complaint.id)}
+                          className="w-full flex justify-center items-center bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition"
+                        >
+                          <Success />
+                          Confirm Resolved (after checking with personnel)
+                        </button>
+                        <p className="text-xs text-gray-500 mt-2 text-center">
+                          Personnel don't have app access — please verify completion with {complaint.assigned_name} directly before confirming.
+                        </p>
+                      </div>
                     ) : (
                       <button
                         onClick={() => openAssignModal(complaint.id, complaint.complaint_type)}
