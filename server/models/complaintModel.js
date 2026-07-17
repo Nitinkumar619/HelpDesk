@@ -16,7 +16,6 @@ const generateCode = () => Math.floor(1000 + Math.random() * 9000);
  * @returns {Promise<Array<Object>>} A promise that resolves to an array of all complaint objects.
  */
 const getAll = async () => {
-  // The SQL query is standard and requires no changes.
   const sql = `
     SELECT 
       c.*, 
@@ -24,11 +23,14 @@ const getAll = async () => {
       u.email AS email,
       p.name AS assigned_name, 
       p.contact AS assigned_contact,
-      ct.type_name AS complaint_type
+      ct.type_name AS complaint_type,
+      f.rating AS feedback_rating,
+      f.comment AS feedback_comment
     FROM complaints c
     LEFT JOIN users u ON c.user_id = u.id
     LEFT JOIN personnel p ON c.assigned_personnel_id = p.id
     LEFT JOIN complaint_types ct ON c.complaint_type_id = ct.id
+    LEFT JOIN feedback f ON f.complaint_id = c.id
     ORDER BY c.createdAt DESC
   `;
   try {

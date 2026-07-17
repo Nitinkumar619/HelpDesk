@@ -263,7 +263,34 @@ useEffect(() => {
                       )}
                     </div>
                   </div>
+
+                  {/* Feedback section — only relevant for resolved complaints */}
+                  {complaint.status === "Resolved" && (
+                    <div className="flex items-start space-x-3">
+                      <div className="p-2 bg-indigo-500/10 rounded-lg">
+                        <Success />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-sm font-medium text-indigo-400">Student Feedback</h3>
+                        {complaint.feedback_rating ? (
+                          <>
+                            <p className="text-sm text-yellow-400 mt-1">
+                              {"★".repeat(complaint.feedback_rating)}
+                              {"☆".repeat(5 - complaint.feedback_rating)}
+                              <span className="text-gray-400 ml-2">({complaint.feedback_rating}/5)</span>
+                            </p>
+                            {complaint.feedback_comment && (
+                              <p className="text-sm text-gray-300 mt-1 italic">"{complaint.feedback_comment}"</p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-sm text-gray-500 mt-1">No feedback submitted yet</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   
+                  {/* Date section condensed */}
                   <div className="text-xs text-gray-400 pt-2 border-t border-gray-700">
                     Created: {new Date(complaint.createdAt).toLocaleString()}
                   </div>
