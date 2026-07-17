@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 const StarRating = ({ rating, showCount = true, size = "small" }) => {
   const sizeClass = size === "large" ? "w-8 h-8" : "w-5 h-5";
   
