@@ -197,7 +197,7 @@ const ForgotPassword = async (req, res) => {
 
     resetTokens[token] = { email, expiresAt };
 
-    const resetLink = `http://localhost:5173/reset-password/${token}`;
+    const resetLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/reset-password/${token}`;
     await sendForgotPasswordMail(email, rows[0].name, resetLink);
 
     res.json({ success: true, message: "If a user with that email exists, a reset link has been sent." });
